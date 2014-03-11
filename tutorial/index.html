@@ -1,0 +1,116 @@
+<html>
+<head>
+    <title>Slick Plain SQL Queries - Activator Template</title>
+</head>
+<body>
+
+<div>
+    <h2>Plain SQL Queries</h2>
+    
+    <p>
+        Slick is a Functional Relational Mapping (FRM) library for Scala where you work with relational data in a type-safe and functional way.  Here is an example:
+        <pre><code>coffees.filter(_.price &lt; 10.0).map(_.name)</code></pre>
+        This will produce a query equivalent to the following SQL:
+        <pre><code>select COF_NAME from COFFEES where PRICE &lt; 10.0</code></pre>
+        Developers benefit from the type-safety and composability of FRM as well as being able to reuse the typical Scala collection APIs like <code>filter</code>, <code>map</code>, <code>foreach</code>, etc.
+    </p>
+    <p>
+        Sometimes you may still need to write your own SQL code for an operation which is not well supported at a higher level of abstraction. Instead of falling back to the low level of <a href="http://en.wikipedia.org/wiki/Java_Database_Connectivity" target="_blank">JDBC</a>, you can use Slick’s Plain SQL queries with a much nicer Scala-based API. This template will get you started with the Plain SQL API using a working application.
+    </p>
+</div>
+
+<div>
+    <h2>Run the App</h2>
+    
+    <p>
+        This template includes a simple Scala application, <a href="#code/src/main/scala/PlainSQL.scala" class="shortcut">PlainSQL.scala</a>, which is composed of individual traits demonstrating different aspects of Plain SQL queries in Slick. This application automatically runs when Activator is started and then re-runs after every successful compile.  You can see the output in <a href="#run" class="shortcut">Run</a>.
+    </p>
+</div>
+
+<div>
+    <h2>Project Setup</h2>
+
+    <p>
+        Slick is a library that is easy to include in any project.  This project uses the sbt build tool so the dependency for Slick is specified in the <a href="#code/build.sbt" class="shortcut">build.sbt</a> file.  To make things simple this project uses the H2 database in-memory.  <a href="http://slick.typesafe.com/doc/2.0.0/connection.html" target="_blank">Learn more about connecting to other databases in the Slick docs</a>.
+    </p>
+    <p>
+        The imports in <a href="#code/src/main/scala/PlainSQL.scala" class="shortcut">PlainSQL.scala</a> are different from what you are used to for the <a href="http://slick.typesafe.com/doc/2.0.0/introduction.html#lifted-embedding" target="_blank">Lifted Embedding</a> or <a href="http://slick.typesafe.com/doc/2.0.0/direct-embedding.html" target="_blank">Direct Embedding</a>. First of all, there is no Slick driver being imported. The JDBC-based APIs in Slick depend only on JDBC itself and do not implement any database-specific abstractions. All we need for the database connection is <code>JdbcBackend.Database</code>. The database connection is opened <a href="http://slick.typesafe.com/doc/2.0.0/gettingstarted.html#gettingstarted-dbconnection" target="_blank">in the usual way</a>.
+    </p>
+</div>
+
+
+
+<div>
+    <h2>Data Transfer Classes</h2>
+
+    <p>
+        In <a href="#code/src/main/scala/Transfer.scala" class="shortcut">Transfer.scala</a> we define two data transfer classes, <code>Coffee</code> and <code>Supplier</code>.
+
+        In order to use these classes for returning data from a query, Slick needs to know how to read the values from a <code>PositionedResult</code> object. This is done with an implicit <code>GetResult</code> value. There are predefined <code>GetResult</code> implicits for the standard JDBC types, for Options of those (to represent nullable columns) and for tuples of types which have a <code>GetResult</code>. For the data transfer classes in this example we have to provide our own implicits.
+    </p>
+    <p>
+        <code>GetResult[T]</code> is simply a wrapper for a function <code>PositionedResult => T</code>. The implicit val for <code>Supplier</code> uses the explicit <code>PositionedResult</code> methods <code>getInt</code> and <code>getString</code> to read the next <code>Int</code> or <code>String</code> value in the current row. The second one uses the shortcut method <code>&lt;&lt;</code> which returns a value of whatever type is expected at this place. (Of course you can only use it when the type is actually known like in this constructor call.)
+    </p>
+</div>
+
+<div>
+    <h2>Database Connection</h2>
+
+    <p>
+        Every query that runs against the database needs a database session to run with.  The <a href="#code/src/main/scala/PlainSQL.scala" class="shortcut">PlainSQL.scala</a> file sets up a database connection and gets a session:
+        <pre><code>Database.forURL("jdbc:h2:mem:hello", driver = "org.h2.Driver").withSession { implicit session =&gt;</code></pre>
+        <strong>Note:</strong> We use an <em>implicit</em> <code>session</code> here to avoid specifying it explicitly with every query.
+    </p>
+    <p>
+        The <code>session</code> can now be used in the scope of the provided function to make queries to the database. The session is automatically closed after the function completes.
+        <a href="http://slick.typesafe.com/doc/2.0.0/connection.html#session-handling" target="_blank">Learn more about session and connnection handling in the Slick docs</a>.
+    </p>
+</div>
+
+<div>
+    <h2>String Interpolation</h2>
+
+    <p>
+        String interpolation with the interpolators <code>sql</code> and <code>sqlu</code> is the easiest and syntactically nicest way of building a parameterized query. Any variable or expression injected into a query gets turned into a bind variable in the resulting query string. It is not inserted directly into a query string, so there is no danger of SQL injection attacks. You can use <code>#$</code> instead of <code>$</code> to get the literal value inserted directly into the query. You can see this in action in <a href="#code/src/main/scala/Interpolation.scala" class="shortcut">Interpolation.scala</a>.
+    </p>
+    <p>
+        The <code>sqlu</code> interpolator (employed by the method <code>createSchema</code>) is used for <em>update</em> statements or DDL statements, which may return a number of affected rows but not a result set. The queries can be executed directly, in this case with the <code>execute</code> method which ignores the return value.
+    </p>
+    <p>
+        The method <code>coffeeByName</code> uses the <code>sql</code> interpolator which is needed for returning a result set. The result type is specified in a call to <code>as</code>. Since we expect a result set of zero or one rows in this methods, we use <code>firstOption</code> to execute the query.
+   </p>
+</div>
+
+<div>
+    <h2>Building DDL / DML Statements</h2>
+
+    <p>
+        Instead of using string interpolators, you can build <code>StaticQuery</code> objects directly, as demonstrated in <a href="#code/src/main/scala/BuildQuery.scala" class="shortcut">BuildQuery.scala</a>. The simplest <code>StaticQuery</code> method is </code>updateNA</code> which creates a parameterless (<em>NA = no args</em>) <code>StaticQuery[Unit, Int]</code> which is supposed to return the row count from a DDL statement instead of a result set, like when you are using the <code>sqlu</code> interpolator. You can see it being used in the method <code>createCoffees</code>.
+    </p>
+    <p>
+        You can append a <code>String</code> to an existing <code>StaticQuery</code> object with <code>+</code>, yielding a new <code>StaticQuery</code> with the same types. The convenience method <code>StaticQuery.u</code> constructs an empty update query to start with (identical to <code>StaticQuery.updateNA("")</code>). We are using it to insert some data into the <code>SUPPLIERS</code> table in the method <code>insertSuppliers</code>.
+    </p>
+    <p>
+        Embedding literals into SQL code is generally not recommended for security and performance reasons, especially if they are to be filled at run-time with user-provided data. You can use the special concatenation operator <code>+?</code> to add a bind variable to a query string and instantiate it with the provided value when the statement gets executed, as shown in <code>insertCoffees</code>.
+    </p>
+</div>
+
+<div>
+    <h2>Building Query Statements</h2>
+
+    <p>
+        Similar to <code>updateNA</code>, there is a <code>queryNA</code> method which takes a type parameter for the rows of the result set. You can use it to execute a select statement and iterate over the results, as in <code>printAll</code>.
+    </p>
+    <p>
+        The <code>queryNA</code> method for parameterless queries is complemented by <code>query</code>, which takes two type parameters, one for the query parameters and one for the result set rows. Similarly, there is a matching <code>update</code> method for <code>updateNA</code>. The resulting query needs to be applied first before calling one of the methods that executes it, as shown in <code>printParameterized</code>.
+    </p>
+</div>
+
+<div>
+    <h2>Next Steps</h2>
+
+    Check out the full <a href="http://slick.typesafe.com/doc/2.0.0/" target="_blank">Slick docs</a>.
+</div>
+
+</body>
+</html>

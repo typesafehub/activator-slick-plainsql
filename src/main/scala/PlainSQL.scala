@@ -1,24 +1,36 @@
-import scala.slick.jdbc.JdbcBackend.Database
+import scala.concurrent.{Future, Await}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import slick.driver.H2Driver.api._
 
 /** A simple example that uses plain SQL queries against an in-memory
   * H2 database. The example data comes from Oracle's JDBC tutorial at
   * http://download.oracle.com/javase/tutorial/jdbc/basics/tables.html. */
-object PlainSQL extends App with Interpolation with Transfer with BuildQuery {
+object PlainSQL extends App with Interpolation with Transfer {
+  val db = Database.forConfig("h2mem1")
+  try {
+    val f: Future[_] = {
 
-  // Open a database connection
-  Database.forURL("jdbc:h2:mem:hello", driver = "org.h2.Driver") withSession { implicit session =>
+      val a: DBIO[Unit] = DBIO.seq(
+        createSuppliers,
+        createCoffees,
+        insertSuppliers,
+        insertCoffees,
+        printAll,
+        printParameterized,
+        coffeeByName("Colombian").map { s =>
+          println(s"Coffee Colombian: $s")
+        },
+        deleteCoffee("Colombian").map { rows =>
+          println(s"Deleted $rows rows")
+        },
+        coffeeByName("Colombian").map { s =>
+          println(s"Coffee Colombian: $s")
+        }
+      )
+      db.run(a)
 
-    createSuppliers
-    createCoffees
-    insertSuppliers
-    insertCoffees
-    printAll
-    printParameterized
-
-    println("Coffee Colombian: " + coffeeByName("Colombian"))
-
-    val rows = deleteCoffee("Colombian")
-    println(s"Deleted $rows rows")
-    println("Coffee Colombian: " + coffeeByName("Colombian"))
-  }
+    }
+    Await.result(f, Duration.Inf)
+  } finally db.close
 }

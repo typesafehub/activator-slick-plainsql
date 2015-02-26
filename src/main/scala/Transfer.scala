@@ -1,5 +1,5 @@
-import scala.slick.jdbc.GetResult
-import scala.slick.jdbc.JdbcBackend.Session
+import slick.driver.H2Driver.api._
+import slick.jdbc.GetResult
 
 /** The Data Transfer Objects for the PlainSQL app */
 trait Transfer { this: PlainSQL.type =>

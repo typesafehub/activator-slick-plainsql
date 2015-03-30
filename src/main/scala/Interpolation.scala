@@ -11,7 +11,7 @@ trait Interpolation { this: PlainSQL.type =>
       price double not null,
       sales int not null,
       total int not null,
-      foreign key(sup_id) references suppliers(id))""".head
+      foreign key(sup_id) references suppliers(id))"""
 
   def createSuppliers: DBIO[Int] =
     sqlu"""create table suppliers(
@@ -20,7 +20,7 @@ trait Interpolation { this: PlainSQL.type =>
       street varchar not null,
       city varchar not null,
       state varchar not null,
-      zip varchar not null)""".head
+      zip varchar not null)"""
 
   def insertSuppliers: DBIO[Unit] = DBIO.seq(
     // Insert some suppliers
@@ -31,7 +31,7 @@ trait Interpolation { this: PlainSQL.type =>
 
   def insertCoffees: DBIO[Unit] = {
     def insert(c: Coffee): DBIO[Int] =
-      sqlu"insert into coffees values (${c.name}, ${c.supID}, ${c.price}, ${c.sales}, ${c.total})".head
+      sqlu"insert into coffees values (${c.name}, ${c.supID}, ${c.price}, ${c.sales}, ${c.total})"
 
     // Insert some coffees. The SQL statement is the same for all calls:
     // "insert into coffees values (?, ?, ?, ?, ?)"
@@ -80,5 +80,5 @@ trait Interpolation { this: PlainSQL.type =>
   }
 
   def deleteCoffee(name: String): DBIO[Int] =
-    sqlu"delete from coffees where name = $name".head
+    sqlu"delete from coffees where name = $name"
 }

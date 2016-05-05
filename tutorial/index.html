@@ -15,7 +15,7 @@
 
     <pre><code>select COF_NAME from COFFEES where PRICE &lt; 10.0</code></pre>
 
-    <p>Developers benefit from the type-safety and composability of FRM as well as being able to reuse the typical Scala collection APIs like <code>filter</code>, <code>map</code>, <code>flatMap</code>, etc. <a href="http://typesafe.com/activator/template/hello-slick-3.1" target="_blank">Learn more about Slick's Scala-based query API in the "Hello Slick" Activator template</a>.</p>
+    <p>Developers benefit from the type-safety and composability of FRM as well as being able to reuse the typical Scala collection APIs like <code>filter</code>, <code>map</code>, <code>flatMap</code>, etc. <a href="https://www.lightbend.com/activator/template/hello-slick-3.1" target="_blank">Learn more about Slick's Scala-based query API in the "Hello Slick" Activator template</a>.</p>
 
     <p>Sometimes you may still need to write your own SQL code for an operation which is not well supported at a higher level of abstraction. Instead of falling back to the low level of <a href="http://en.wikipedia.org/wiki/Java_Database_Connectivity" target="_blank">JDBC</a>, you can use Slick’s <em>Plain SQL queries</em> with a much nicer Scala-based API that integrates nicely into your asynchronous application. This template will get you started with the Plain SQL API using a working application.</p>
 </div>
@@ -25,7 +25,7 @@
 
     <p>Slick is a library that is easy to include in any project.  This project uses the sbt build tool so the dependency for Slick is specified in the <a href="#code/build.sbt" class="shortcut">build.sbt</a> file.  To make things simple this project uses an embedded H2 in-memory database.</p>
 
-    <p><a href="http://slick.typesafe.com/doc/3.1.0/database.html#database-configuration" target="_blank">Learn more about connecting to databases in the Slick docs</a>.</p>
+    <p><a href="http://slick.lightbend.com/doc/3.1.0/database.html#databaseconfig" target="_blank">Learn more about connecting to databases in the Slick docs</a>.</p>
 
     <p>This template includes a simple Scala application, <a href="#code/src/main/scala/PlainSQL.scala" class="shortcut">PlainSQL.scala</a>, which is composed of individual traits demonstrating different aspects of Plain SQL queries in Slick. This application automatically runs when Activator is started and then re-runs after every successful compile.  You can see the output in <a href="#run" class="shortcut">Run</a>.</p>
 
@@ -159,7 +159,7 @@ val db = dc.db</code></pre>
 <div>
     <h2>Next Steps</h2>
 
-    <p>Check out the full <a href="http://slick.typesafe.com/doc/" target="_blank">Slick manual and API docs</a>.</p>
+    <p>Check out the full <a href="http://slick.lightbend.com/doc/3.1.0/" target="_blank">Slick manual and API docs</a>.</p>
 
     <p>You can also find more Slick templates, contributed by both, the Slick team and the community, <a href="/home" class="shortcut">here in Activator</a>.</p>
 </div>
